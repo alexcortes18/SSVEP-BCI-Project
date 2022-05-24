@@ -20,11 +20,11 @@ for a = 1:N
     % STARTS HERE:
     %order of data = (channel, points, electrode dry/wet, blocks, targets)
     
-    subjects = data(:,125:625,:); % 125 is for 0.5 s , 625 is for 2.5 s
+    trials = data(:,125:625,:); % 125 is for 0.5 s , 625 is for 2.5 s
     new_subject = {};
     
     for i = 1:240
-        new_subject = [new_subject,subjects(:,:,i)];
+        new_trial = [new_subject,trials(:,:,i)];
     end
     
     tic
