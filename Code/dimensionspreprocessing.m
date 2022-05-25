@@ -9,8 +9,11 @@ eeg_data = {};
 for i = 1:N
    if(i<10)
      load(location + folder +'S00'+i+'.mat')
+   elseif(i<100)
+     load(location + folder +'S0'+i+'.mat') % 10 to 99
    else
-     load(location + folder +'S0'+i+'.mat') % special case for 10 or higher
+     load(location + folder +'S'+i+'.mat') % 100 to 102
+
    end
    eeg_data = [eeg_data, data];
 end

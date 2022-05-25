@@ -9,8 +9,11 @@ eeg_data = {};
 for i = 1:N
    if(i<10)
      load(location + folder +'S00'+i+'.mat')
+   elseif(i<100)
+     load(location + folder +'S0'+i+'.mat') % 10 to 
    else
-     load(location + folder +'S0'+i+'.mat') % special case for 10 or higher
+     load(location + folder +'S0'+i+'.mat')
+
    end
    eeg_data = [eeg_data, data];
 end
@@ -20,11 +23,11 @@ for a = 1:N
     % STARTS HERE:
     %order of data = (channel, points, electrode dry/wet, blocks, targets)
     
-    trials = data(:,125:625,:); % 125 is for 0.5 s , 625 is for 2.5 s
+    subjects = data(:,125:625,:); % 125 is for 0.5 s , 625 is for 2.5 s
     new_subject = {};
     
     for i = 1:240
-        new_trial = [new_subject,trials(:,:,i)];
+        new_subject = [new_subject,subjects(:,:,i)];
     end
     
     tic
