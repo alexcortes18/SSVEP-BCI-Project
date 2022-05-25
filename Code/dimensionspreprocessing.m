@@ -1,3 +1,5 @@
+% To Run the FFT function (timefreq2004) we need to have previously ran
+% timefreq2004.m file.
 
 location = "C:/Users/alexc/OneDrive/Documents/Taiwan Classes/Second Semester/Brain Computer Interfaces/BCI Presentation and Project/SSVEP Projects/Wearable SSVEP BCI Database/Dataset/";
 folder = "Raw_Datasets/";
@@ -13,7 +15,6 @@ for i = 1:N
      load(location + folder +'S0'+i+'.mat') % 10 to 99
    else
      load(location + folder +'S'+i+'.mat') % 100 to 102
-
    end
    eeg_data = [eeg_data, data];
 end
