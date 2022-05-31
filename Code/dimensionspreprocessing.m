@@ -8,6 +8,10 @@ matFiles = dir(location + folder +"*.mat") ;
 N = length(matFiles); 
 eeg_data = {};
 
+
+
+%N = 10; %momentarily only get these amount of files
+
 for i = 1:N
    if(i<10)
      load(location + folder +'S00'+i+'.mat')
@@ -19,6 +23,9 @@ for i = 1:N
    eeg_data = [eeg_data, data];
 end
 %%
+
+all_fir_ff = {};
+
 for a = 1:N
     data = eeg_data{1,a};
     % STARTS HERE:
@@ -67,8 +74,19 @@ for a = 1:N
             fft_fir(i+(trials*(c-1)),:) = mean(PB(:,:), 2); % The one we need
         end
     end
+
+    all_fir_ff = [all_fir_ff,fft_fir];
+
+   if(i<10)
+     save(location+"FFTs_from_matlab/cleaned_S00" + a +".mat",'fft_fir');
+   elseif(i<100)
+     save(location+"FFTs_from_matlab/cleaned_S0" + a +".mat",'fft_fir');
+   else
+     save(location+"FFTs_from_matlab/cleaned_S" + a +".mat",'fft_fir');
+   end
+
+    %save(location+"FFTs_from_matlab/cleaned_S00" + a +".mat",'fft_fir');
     
-    save(location+"FFTs_from_matlab/cleaned_S00" + a +".mat",'fft_fir');
 end
 %%
 for i = 1:120
