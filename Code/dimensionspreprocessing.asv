@@ -15,7 +15,7 @@ N = length(matFiles);
 eeg_data = {};
 
 
-N = 10; % momentarily only get these amount of files
+N = 1; % momentarily only get these amount of files
 
 
 for i = 1:N
@@ -36,7 +36,7 @@ end
 % use for Machine Learning Classfication.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-all_subjects_fir_ff = {};
+all_fir_ff = {};
 
 for a = 1:N
     %Selecting just the file we want through the index on "a":
@@ -113,103 +113,102 @@ for a = 1:N
     s = struct('data', raw_data(:,:), 'srate', 250, 'trials', 1, 'event', 1, "epoch", []);
     [sub1_data] = pop_eegfilt(s,9,15,filtorder,0,FIR); %FIR.
 
-%     signal = sub1_data.data(i,:);
-%     signal=signal-mean(signal); 
+    signal = sub1_data.data(i,:);
+    signal=signal-mean(signal); 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Previous FFT (not working that well?):
-    %     trials = 240; % 240 trials
-    %     for c = 1:8 %8 Channels in total
-    %         for i = 1: trials
-    %             [PB, freqs, times] = timefreq2004(sub1_data.data(i+(trials*(c-1)),:)', 250, 'wavelet', 0,...
-    %             'freqs', [1 30], 'winsize', 256);
-    %             PB = 10 * log10(PB .* conj(PB));
-    %             %idx = (times>500 & times<2000);
-    %             fft_fir(i+(trials*(c-1)),:) = mean(PB(:,:), 2); % The one we need
-    %         end
-    %     end
-
-    % for i = 1:10
-    % plot(freqs,fft_fir(i,:));
-    % hold on;
-    % end
+%     trials = 240; % 240 trials
+%     for c = 1:8 %8 Channels in total
+%         for i = 1: trials
+%             [PB, freqs, times] = timefreq2004(sub1_data.data(i+(trials*(c-1)),:)', 250, 'wavelet', 0,...
+%             'freqs', [1 30], 'winsize', 256);
+%             PB = 10 * log10(PB .* conj(PB));
+%             %idx = (times>500 & times<2000);
+%             fft_fir(i+(trials*(c-1)),:) = mean(PB(:,:), 2); % The one we need
+%         end
+%     end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Performing FFT:
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-    %Signal info:
-    Fs = 250; % sampling frequency
-    seconds = (ending_data_point - starting_data_point)/Fs; % to get the amount of seconds if we want to plot;
-    Ts = 1/Fs; % time step or sampling period
-    dt = 0:Ts:seconds;
-
-    all_fft = {};  % FFTs for 1920 trials (240 trials x 8 channels) for 1 subject
-    all_xfft = {}; % XFFT, so the index in the x axis
-
     trials = 240; % 240 trials
     for c = 1:8 %8 Channels in total
         for i = 1: trials
+        Fs = 250; % sampling frequency
+        seconds = (ending_data_point - starting_data_point)/Fs; % to get the amount of seconds if we want to plot;
+        Ts = 1/Fs; % time step or sampling period
+        dt = 0:Ts:seconds;
         
-        % Helps to take away the DC mean component 0 Hz:
-        signal = sub1_data.data(i+(trials*(c-1)),:);
-        signal=signal-mean(signal);
+        signal = sub1_data.data(100,:);
+        signal=signal-mean(signal); % helps to take away the DC mean component 0 Hz
         %signal = detrend(signal,'constant');
         
-        %%FFT:
-
         nfft = length(signal); % length of time domain signal
         nfft2 = 2^nextpow2(nfft); % length of the signal in power 2
         ff = fft(signal,nfft2);
         fff = ff(1:nfft2/2); % to avoid the mirrored signal
-        %fff = fff/max(fff); %  normalize the amplitude
+        fff = fff/max(fff); %  normalize the amplitude
         xfft = Fs*(0:nfft2/2-1)/nfft2;
-        
-        all_fft = [all_fft, abs(fff)];
-        all_xfft = [all_xfft,xfft];
         end
     end
 
-   % Doesn't really save the FFT of all subjects correctly? (Not really
-   % needed anyways, since each subject is saved in a separate .mat file.)
-   all_subjects_fir_ff = [all_subjects_fir_ff,all_fft]; % Just in case, but not really needed.
+   all_fir_ff = [all_fir_ff,fft_fir];
 
-   destination_folder = "New_FFTs_matlab"; %for some testing while i don't use the whole .mat original files (just a subset)
+   destination_folder = "testing"; %for some testing while i don't use the whole .mat original files (just a subset)
    %destination_folder = "FFTs_from_matlab"; my final folder
 
    if(i<10)
-     save(location+destination_folder+"/cleaned_S00" + a +".mat",'all_fft');
+     save(location+destination_folder+"/cleaned_S00" + a +".mat",'fft_fir');
    elseif(i<100)
-     save(location+destination_folder+"/cleaned_S0" + a +".mat",'all_fft');
+     save(location+destination_folder+"/cleaned_S0" + a +".mat",'fft_fir');
    else
-     save(location+destination_folder+"/cleaned_S" + a +".mat",'all_fft');
+     save(location+destination_folder+"/cleaned_S" + a +".mat",'fft_fir');
    end
 end
-
 %%
-for i = 1:12
-index = i; %index of FFT to plot, 1 to 1920. (for 1 subject). If you want to plot of multiple
-% subjects and not the last one in memory, use all_subjects_fir_ff{1,i}{(1,index}.
-fft_to_plot = all_fft{1,index};
-signal = sub1_data.data(index,:);
+for i = 1:10
+plot(freqs,fft_fir(i,:));
+hold on;
+end
+%%
+% Another FFT try:
+
+Fs = 250; % sampling frequency
+Ts = 1/Fs; % time step or sampling period
+dt = 0:Ts:2;
+
+for i = 1:50 %1920
+%signal = raw_data(i,:) ;
+signal = sub1_data.data(100,:); %(125:625) for 2 seconds of data points
+
+signal=signal-mean(signal); % helps to take away the DC mean component 0 Hz
+%signal = detrend(signal,'constant');
+
+nfft = length(signal); % length of time domain signal
+nfft2 = 2^nextpow2(nfft); % length of the signal in power 2
+ff = fft(signal,nfft2);
+fff = ff(1:nfft2/2); % to avoid the mirrored signal
+fff = fff/max(fff); %  normalize the amplitude
+xfft = Fs*(0:nfft2/2-1)/nfft2;
+
+
 
 subplot(2,1,1);
 plot(dt,signal,'b');
 xlabel('Time [s]');
 ylabel('Amplitude (V)');
 title('Time Domain Signal');
-hold on;
 
 subplot(2,1,2);
-plot(xfft,fft_to_plot,'b');
+plot(xfft,abs(fff),'b');
 %xlim([0 50]);
 %ylim([0 1]);
 xlabel('Frequency [Hz]');
 ylabel('Normalized Amplitude');
 title('Frequency Domain Signal');
 hold on;
-
 end
 
